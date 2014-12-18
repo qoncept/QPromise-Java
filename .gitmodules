@@ -1,0 +1,6 @@
+[submodule "modules/Funcational-Java"]
+	path = modules/Funcational-Java
+	url = https://github.com/qoncept/Funcational-Java.git
+[submodule "modules/Tuple-Java"]
+	path = modules/Tuple-Java
+	url = git@github.com:qoncept/Tuple-Java.git
