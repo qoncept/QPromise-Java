@@ -49,8 +49,12 @@ public class Promise<T> {
 				});
 	}
 
+	public boolean isSettled() {
+		return result != null;
+	}
+
 	private void _fulfill(T value) {
-		if (result != null) {
+		if (isSettled()) {
 			throw new IllegalStateException();
 		}
 
@@ -64,7 +68,7 @@ public class Promise<T> {
 	}
 
 	private void _reject(Exception reason) {
-		if (result != null) {
+		if (isSettled()) {
 			throw new IllegalStateException();
 		}
 
