@@ -12,15 +12,15 @@ import jp.co.qoncept.util.Tuple4;
 public class Promise<T> {
 	private Result<T> result;
 
-	private List<Consumer<T>> fulfilledHandlers;
-	private List<Consumer<Exception>> rejectedHandlers;
+	private List<Consumer<? super T>> fulfilledHandlers;
+	private List<Consumer<? super Exception>> rejectedHandlers;
 
 	public Promise(
-			Consumer<Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>>> executor) {
-		fulfilledHandlers = new ArrayList<Consumer<T>>();
-		rejectedHandlers = new ArrayList<Consumer<Exception>>();
+			Consumer<? super Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>> executor) {
+		fulfilledHandlers = new ArrayList<Consumer<? super T>>();
+		rejectedHandlers = new ArrayList<Consumer<? super Exception>>();
 
-		executor.accept(new Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>>(
+		executor.accept(new Tuple3<Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>(
 				new Consumer<T>() {
 					@Override
 					public void accept(T t) {
@@ -41,10 +41,10 @@ public class Promise<T> {
 
 	private Promise() {
 		this(
-				new Consumer<Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>> t) {
+							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> t) {
 					}
 				});
 	}
@@ -60,7 +60,7 @@ public class Promise<T> {
 
 		result = Result.of(value);
 
-		for (Consumer<T> handler : fulfilledHandlers) {
+		for (Consumer<? super T> handler : fulfilledHandlers) {
 			handler.accept(value);
 		}
 
@@ -74,7 +74,7 @@ public class Promise<T> {
 
 		result = Result.of(reason);
 
-		for (Consumer<Exception> handler : rejectedHandlers) {
+		for (Consumer<? super Exception> handler : rejectedHandlers) {
 			handler.accept(reason);
 		}
 
@@ -100,8 +100,8 @@ public class Promise<T> {
 		rejectedHandlers.clear();
 	}
 
-	private void defer(final Consumer<T> fulfilledHandler,
-			final Consumer<Exception> rejectedHandler) {
+	private void defer(final Consumer<? super T> fulfilledHandler,
+			final Consumer<? super Exception> rejectedHandler) {
 		if (this.result != null) {
 			Result<T> result = this.result;
 
@@ -124,12 +124,14 @@ public class Promise<T> {
 		rejectedHandlers.add(rejectedHandler);
 	}
 
-	public <U> Promise<U> then(final Function<T, Promise<U>> onFulfilled) {
+	public <U> Promise<U> then(
+			final Function<? super T, ? extends Promise<U>> onFulfilled) {
 		return then(onFulfilled, null);
 	}
 
-	public <U> Promise<U> then(final Function<T, Promise<U>> onFulfilled,
-			final Function<Exception, Promise<U>> onRejectedOrNull) {
+	public <U> Promise<U> then(
+			final Function<? super T, ? extends Promise<U>> onFulfilled,
+			final Function<? super Exception, ? extends Promise<U>> onRejectedOrNull) {
 		if (onFulfilled == null) {
 			throw new IllegalArgumentException("'onFulfilled' cannot be null.");
 		}
@@ -145,7 +147,7 @@ public class Promise<T> {
 			@Override
 			public void accept(Exception t) {
 				if (onRejectedOrNull != null) {
-					Function<Exception, Promise<U>> onRejected = onRejectedOrNull;
+					Function<? super Exception, ? extends Promise<U>> onRejected = onRejectedOrNull;
 					Promise<U> recoveryOrNull = onRejected.apply(t);
 					if (recoveryOrNull != null) {
 						Promise<U> recovery = recoveryOrNull;
@@ -161,7 +163,8 @@ public class Promise<T> {
 		return promise;
 	}
 
-	public Promise<T> catch_(final Function<Exception, Promise<T>> onRejected) {
+	public Promise<T> catch_(
+			final Function<? super Exception, ? extends Promise<T>> onRejected) {
 		if (onRejected == null) {
 			throw new IllegalArgumentException("'onRejected' cannot be null.");
 		}
@@ -190,7 +193,7 @@ public class Promise<T> {
 		return promise;
 	}
 
-	public Promise<T> finally_(final Supplier<Promise<T>> onSettled) {
+	public Promise<T> finally_(final Supplier<? extends Promise<T>> onSettled) {
 		if (onSettled == null) {
 			throw new IllegalArgumentException("'onSettled' cannot be null.");
 		}
@@ -250,7 +253,8 @@ public class Promise<T> {
 			return new Result<T>(null, reason);
 		}
 
-		public void ifPresent(Consumer<T> ifPresent, Consumer<Exception> orElse) {
+		public void ifPresent(Consumer<? super T> ifPresent,
+				Consumer<? super Exception> orElse) {
 			if (value != null) {
 				ifPresent.accept(value);
 			} else {
@@ -261,9 +265,9 @@ public class Promise<T> {
 
 	// Extensions
 
-	public static <T> Tuple4<Promise<T>, Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>> deferred() {
+	public static <T> Tuple4<Promise<T>, Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> deferred() {
 		final Promise<T> promise = new Promise<T>();
-		return new Tuple4<Promise<T>, Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>>(
+		return new Tuple4<Promise<T>, Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>(
 				promise, new Consumer<T>() {
 					@Override
 					public void accept(T t) {
@@ -284,10 +288,10 @@ public class Promise<T> {
 
 	public static <T> Promise<T> fulfill(final T value) {
 		return new Promise<T>(
-				new Consumer<Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>> executor) {
+							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
 						executor.get1().accept(value);
 					}
 				});
@@ -295,10 +299,10 @@ public class Promise<T> {
 
 	public static <T> Promise<T> reject(final Exception reason) {
 		return new Promise<T>(
-				new Consumer<Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>> executor) {
+							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
 						executor.get2().accept(reason);
 					}
 				});
@@ -306,21 +310,22 @@ public class Promise<T> {
 
 	public static <T> Promise<T> resolve(final Promise<T> promise) {
 		return new Promise<T>(
-				new Consumer<Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<Consumer<T>, Consumer<Exception>, Consumer<Promise<T>>> executor) {
+							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
 						executor.get3().accept(promise);
 					}
 				});
 	}
 
-	public Promise<Void> then(final Consumer<T> onFulfilled) {
+	public Promise<Void> then(final Consumer<? super T> onFulfilled) {
 		return then(onFulfilled, null);
 	}
 
-	public Promise<Void> then(final Consumer<T> onFulfilled,
-			final Function<Exception, Promise<Void>> onRejectedOrNull) {
+	public Promise<Void> then(
+			final Consumer<? super T> onFulfilled,
+			final Function<? super Exception, ? extends Promise<Void>> onRejectedOrNull) {
 		if (onFulfilled == null) {
 			throw new IllegalArgumentException("'onFulfilled' cannot be null.");
 		}
@@ -340,7 +345,7 @@ public class Promise<T> {
 		});
 	}
 
-	public Promise<T> catch_(final Consumer<Exception> onRejected) {
+	public Promise<T> catch_(final Consumer<? super Exception> onRejected) {
 		if (onRejected == null) {
 			throw new IllegalArgumentException("'onRejected' cannot be null.");
 		}
