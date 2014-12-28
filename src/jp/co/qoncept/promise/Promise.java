@@ -230,32 +230,31 @@ public class Promise<T> {
 	}
 
 	private static class Result<T> {
+		private boolean hasValue;
 		private T value;
 		private Exception reason;
 
-		private Result(T value, Exception reason) {
+		private Result(boolean hasValue, T value, Exception reason) {
 			super();
+			this.hasValue = hasValue;
 			this.value = value;
 			this.reason = reason;
 		}
 
 		public static <T> Result<T> of(T value) {
-			if (value == null) {
-				throw new IllegalArgumentException();
-			}
-			return new Result<T>(value, null);
+			return new Result<T>(true, value, null);
 		}
 
 		public static <T> Result<T> of(Exception reason) {
 			if (reason == null) {
 				throw new IllegalArgumentException();
 			}
-			return new Result<T>(null, reason);
+			return new Result<T>(false, null, reason);
 		}
 
 		public void ifPresent(Consumer<? super T> ifPresent,
 				Consumer<? super Exception> orElse) {
-			if (value != null) {
+			if (hasValue) {
 				ifPresent.accept(value);
 			} else {
 				orElse.accept(reason);
