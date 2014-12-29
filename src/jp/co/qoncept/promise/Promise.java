@@ -291,7 +291,7 @@ public class Promise<T> {
 					@Override
 					public void accept(
 							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
-						executor.get1().accept(value);
+						executor.get0().accept(value);
 					}
 				});
 	}
@@ -302,7 +302,7 @@ public class Promise<T> {
 					@Override
 					public void accept(
 							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
-						executor.get2().accept(reason);
+						executor.get1().accept(reason);
 					}
 				});
 	}
@@ -313,7 +313,7 @@ public class Promise<T> {
 					@Override
 					public void accept(
 							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
-						executor.get3().accept(promise);
+						executor.get2().accept(promise);
 					}
 				});
 	}

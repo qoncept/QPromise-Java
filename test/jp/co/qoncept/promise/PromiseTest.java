@@ -25,7 +25,7 @@ public class PromiseTest {
 						new Timer().schedule(new TimerTask() {
 							@Override
 							public void run() {
-								executor.get1().accept(value + 1);
+								executor.get0().accept(value + 1);
 							}
 						}, 100L);
 					}
@@ -41,7 +41,7 @@ public class PromiseTest {
 						new Timer().schedule(new TimerTask() {
 							@Override
 							public void run() {
-								executor.get2().accept(reason);
+								executor.get1().accept(reason);
 							}
 						}, 100L);
 					}
