@@ -16,7 +16,7 @@ public class Promise<T> {
 	private List<Consumer<? super Exception>> rejectedHandlers;
 
 	public Promise(
-			Consumer<? super Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>> executor) {
+			Consumer<? super Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>>> executor) {
 		fulfilledHandlers = new ArrayList<Consumer<? super T>>();
 		rejectedHandlers = new ArrayList<Consumer<? super Exception>>();
 
@@ -41,10 +41,10 @@ public class Promise<T> {
 
 	private Promise() {
 		this(
-				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> t) {
+							Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>> t) {
 					}
 				});
 	}
@@ -287,10 +287,10 @@ public class Promise<T> {
 
 	public static <T> Promise<T> fulfill(final T value) {
 		return new Promise<T>(
-				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
+							Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>> executor) {
 						executor.get0().accept(value);
 					}
 				});
@@ -298,10 +298,10 @@ public class Promise<T> {
 
 	public static <T> Promise<T> reject(final Exception reason) {
 		return new Promise<T>(
-				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
+							Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>> executor) {
 						executor.get1().accept(reason);
 					}
 				});
@@ -309,10 +309,10 @@ public class Promise<T> {
 
 	public static <T> Promise<T> resolve(final Promise<T> promise) {
 		return new Promise<T>(
-				new Consumer<Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>>>() {
 					@Override
 					public void accept(
-							Tuple3<? extends Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> executor) {
+							Tuple3<? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>> executor) {
 						executor.get2().accept(promise);
 					}
 				});

@@ -18,10 +18,10 @@ import org.junit.Test;
 public class PromiseTest {
 	public Promise<Integer> asyncSucceed(final Integer value) {
 		return new Promise<Integer>(
-				new Consumer<Tuple3<? extends Consumer<? super Integer>, Consumer<? super Exception>, Consumer<? super Promise<Integer>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super Integer>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<Integer>>>>() {
 					@Override
 					public void accept(
-							final Tuple3<? extends Consumer<? super Integer>, Consumer<? super Exception>, Consumer<? super Promise<Integer>>> executor) {
+							final Tuple3<? extends Consumer<? super Integer>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<Integer>>> executor) {
 						new Timer().schedule(new TimerTask() {
 							@Override
 							public void run() {
@@ -34,10 +34,10 @@ public class PromiseTest {
 
 	public Promise<Integer> asyncFail(final Exception reason) {
 		return new Promise<Integer>(
-				new Consumer<Tuple3<? extends Consumer<? super Integer>, Consumer<? super Exception>, Consumer<? super Promise<Integer>>>>() {
+				new Consumer<Tuple3<? extends Consumer<? super Integer>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<Integer>>>>() {
 					@Override
 					public void accept(
-							final Tuple3<? extends Consumer<? super Integer>, Consumer<? super Exception>, Consumer<? super Promise<Integer>>> executor) {
+							final Tuple3<? extends Consumer<? super Integer>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<Integer>>> executor) {
 						new Timer().schedule(new TimerTask() {
 							@Override
 							public void run() {
