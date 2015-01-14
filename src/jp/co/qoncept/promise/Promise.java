@@ -264,7 +264,7 @@ public class Promise<T> {
 
 	// Extensions
 
-	public static <T> Tuple4<Promise<T>, Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>> deferred() {
+	public static <T> Tuple4<? extends Promise<T>, ? extends Consumer<? super T>, ? extends Consumer<? super Exception>, ? extends Consumer<? super Promise<T>>> deferred() {
 		final Promise<T> promise = new Promise<T>();
 		return new Tuple4<Promise<T>, Consumer<? super T>, Consumer<? super Exception>, Consumer<? super Promise<T>>>(
 				promise, new Consumer<T>() {
